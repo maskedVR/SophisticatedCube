@@ -4,7 +4,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SophisticatedCube
 {
-    [BepInPlugin("com.ngbatz.gorillatag.sophisticatedcube", "SophisticatedCube", "1.0.0")]
+    [BepInPlugin("com.ngbatz.gorillatag.sophisticatedcube", "SophisticatedCube", "1.0.1")]
     public class CubeMod : BaseUnityPlugin
     {
         void Start()
@@ -33,14 +33,20 @@ namespace SophisticatedCube
             }
             else
             {
-                Logger.LogError("PENIS HEHAHEHHAEHEA");
+                Logger.LogError("PENIS HAHHEAHEHEHHAHE");
             }
-
             var renderer = cube.GetComponent<Renderer>();
             if (renderer != null)
             {
-                renderer.material.color = Color.green;
+                renderer.material = CreateMat(Color.green);
             }
+        }
+
+        Material CreateMat(Color color)
+        {
+            Material Mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            Mat.SetColor("_BaseColor", color);
+            return Mat;
         }
     }
 }
