@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -25,6 +25,17 @@ namespace SophisticatedCube
             {
                 cubeCollider = cube.AddComponent<BoxCollider>();
             }
+            cubeCollider.isTrigger = true;
+            int gorillaTriggerLayer = LayerMask.NameToLayer("Gorilla Trigger");
+            if (gorillaTriggerLayer != -1)
+            {
+                cube.layer = gorillaTriggerLayer;
+            }
+            else
+            {
+                Logger.LogError("PENIS HEHAHEHHAEHEA");
+            }
+
             var renderer = cube.GetComponent<Renderer>();
             if (renderer != null)
             {
