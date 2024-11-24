@@ -1,61 +1,45 @@
+using System;
+using System.IO;
+using System.Reflection;
 using BepInEx;
 using UnityEngine;
-using UnityEngine.XR;
-using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.Animations.Rigging;
 
 namespace SophisticatedCube
 {
     [BepInPlugin("com.ngbatz.gorillatag.sophisticatedcube", "SophisticatedCube", "1.0.1")]
-    public class CubeMod : BaseUnityPlugin
-    {
-        private GameObject cube;
+	public class Plugin : BaseUnityPlugin
+	{
+		public static Plugin instance;
+        public static AssetBundle bundle;
+        public static GameObject assetBundleParent;
+        public static string assetBundleName = "grabbbbb";
+        public static string parentName = "BundleParent (put objects in here DONT MOVE)";
 
-        void Start()
-        {
-            CreateCube();
-        }
-
-        void Update()
-        {
-            if (ControllerInputPoller.instance.rightControllerPrimaryButton || UnityInput.Current.GetKey(KeyCode.E))
-            {
-                Teleport();
-            }
-        }
-
-        void CreateCube()
-        {
-            cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.transform.position = Vector3.zero;
-            cube.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            Rigidbody rb = cube.AddComponent<Rigidbody>();
+		public void Start()
+		{
+			instance = this;
+			bundle = LoadAssetBundle("SophisticatedCube.AssetBundles." + assetBundleName);
+            assetBundleParent = Instantiate(bundle.LoadAsset<GameObject>(parentName));
+            assetBundleParent.transform.position = new Vector3(-67.2225f, 11.57f, -82.611f);
+            GameObject cube = GameObject.Find("grabbable");
+            cube.AddComponent<Rigidbody>();
+            Rigidbody rb = cube.GetComponent<Rigidbody>();
             rb.isKinematic = true;
-            XRGrabInteractable grabInteractable = cube.AddComponent<XRGrabInteractable>();
-            Collider collider = cube.GetComponent<Collider>();
-            if (collider == null)
-            {
-                collider = cube.AddComponent<BoxCollider>();
-            }
-            collider.isTrigger = true;
+            cube.AddComponent<UnityEngine.XR.Interaction.Toolkit.XRGrabInteractable>();
             int gorillaTriggerLayer = LayerMask.NameToLayer("Gorilla Trigger");
             if (gorillaTriggerLayer != -1)
             {
                 cube.layer = gorillaTriggerLayer;
             }
-            var renderer = cube.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                renderer.material.color = Color.green;
-            }
         }
 
-        void Teleport()
+        public AssetBundle LoadAssetBundle(string path)
         {
-            if (Camera.main != null)
-            {
-                Vector3 forward = Camera.main.transform.forward;
-                cube.transform.position = Camera.main.transform.position + forward * 0.5f;
-            }
+            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(path);
+            AssetBundle bundle = AssetBundle.LoadFromStream(stream);
+            stream.Close();
+            return bundle;
         }
     }
 }
